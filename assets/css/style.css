@@ -2641,6 +2641,7 @@ img {
     margin-right: 15px;
 }
 
+
 .about-section .content-block .contact-link {
     position: relative;
     margin-bottom: 10px;
@@ -2934,10 +2935,28 @@ img {
     border-color: #222;
 }
 
+
 /* Mayor message section */
 
 .mayor-message-section {
     position: relative;
+}
+.mayor-message-section .content-block .bottom-content {
+    position: relative;
+    padding-top: 35px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.about-section .content-block .bottom-content .text {
+    position: relative;
+    font-size: 18px;
+    margin-bottom: 20px;
+    margin-right: 15px;
 }
 
 .mayor-message-section .auto-container {
@@ -2951,7 +2970,7 @@ img {
 
 .mayor-message-section .content-block {
     position: relative;
-    padding: 120px 0 70px;
+   
 }
 
 .mayor-message-section h3 {
@@ -3013,6 +3032,96 @@ img {
     max-width: 140px;
     margin: 0 auto;
 }
+
+
+.mayor-message-section .content-block .contact-link {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.mayor-message-section .content-block .contact-link li {
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.mayor-message-section .content-block .contact-link li a {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    line-height: 66px;
+    text-align: center;
+    background-color: #f4f4f4;
+    color: #222;
+    border-radius: 50%;
+    font-size: 27px;
+    transition: .5s;
+}
+
+.mayor-message-section .content-block .contact-link li a i {
+    position: relative;
+}
+
+.mayor-message-section .content-block .contact-link li a:hover {
+    color: #fff;
+}
+
+.mayor-message-section .content-block .contact-link li a:before {
+    position: absolute;
+    content: '';
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    -webkit-transform: scale(.7);
+    -ms-transform: scale(.7);
+    transform: scale(.7);
+    opacity: 0;
+    -webkit-transition: .5s;
+    -o-transition: .5s;
+    transition: .5s;
+}
+
+.mayor-message-section .content-block .contact-link li a:hover:before {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+}
+
+
+
+.mayor-message-section .content-block .list {
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.mayor-message-section.content-block .list li {
+    position: relative;
+    margin-bottom: 12px;
+    color: #222;
+    transition: .5s;
+    font-weight: 700;
+    padding-left: 30px;
+}
+
+.mayor-message-section .content-block .list li:after {
+    font-family: 'icomoon';
+    content: "\e902";
+    position: absolute;
+    left: 0;
+    top: 5px;
+    line-height: 25px;
+    font-size: 15px;
+    font-weight: 400;
+    transition: .5s;
+    border-right: 1px solid #222;
+    line-height: 16px;
+    padding-right: 5px;
+}
+
 
 
 /* Projects section */
@@ -4392,7 +4501,7 @@ img {
 }
 
 .features-section-two .bottom-content .sec-title {
-    margin-bottom: 30px;
+    margin-bottom: 10px;
 }
 
 .features-section-two .bottom-content .text {
@@ -4402,10 +4511,13 @@ img {
 }
 
 .features-section-two .bottom-content .image {
-    margin-bottom: -170px;
-    margin-left: -87px;
     text-align: right;
 }
+
+.features-section-two .top-content .text {
+    color: rgb(255 255 255 / 0.65);
+}
+
 
 /* News Section Two */
 .news-section-two {

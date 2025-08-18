@@ -30,7 +30,7 @@ if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 
         $botcheck = $_POST['form_botcheck'];
 
-        $toemail = 'templatecform@gmail.com'; // Your Email Address
+        $toemail = 'cidades.intel.ire@ifba.edu.br'; // Your Email Address
         $toname = 'template_path'; // Your Name
 
         if( $botcheck == '' ) {
