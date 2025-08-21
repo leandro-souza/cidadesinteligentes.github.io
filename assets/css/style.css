@@ -5382,7 +5382,7 @@ img {
 /* Sidebar page container */
 .sidebar-page-container {
     position: relative;
-    padding: 120px 0 90px;
+    padding: 40px 0 90px;
 }
 
 /* Depertment details */
@@ -6295,7 +6295,6 @@ blockquote cite {
     padding: 50px 55px 30px;
     padding-left: 175px;
     margin-bottom: 90px;
-    margin-top: 90px;
 }
 
 .blog-single-post .author-box .image {
