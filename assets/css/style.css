@@ -2957,6 +2957,7 @@ img {
     font-size: 18px;
     margin-bottom: 20px;
     margin-right: 15px;
+    
 }
 
 .mayor-message-section .auto-container {
@@ -2996,6 +2997,7 @@ img {
 .mayor-message-section .content-block .text p {
     position: relative;
     margin-bottom: 30px;
+    
 }
 
 .mayor-message-section .sign {
@@ -4348,7 +4350,7 @@ img {
 /* Mayor message section two */
 .mayor-message-section-two {
     position: relative;
-    padding: 120px 0 90px;
+
 }
 
 .mayor-message-section-two .content-block {
@@ -5295,6 +5297,27 @@ img {
     margin-bottom: 35px;
 }
 
+/* Solution section two */
+.solution-section {
+    padding-bottom: 30px;
+}
+
+.solution-section.content-block {
+    margin-right: 60px;
+}
+
+.solution-section.image-block {
+    padding-left: 0;
+    margin-left: -42px;
+}
+
+.solution-section .content-block .list li {
+    margin-bottom: 8px;
+}
+
+.solution-section .content-block .list {
+    margin-bottom: 35px;
+}
 /* CTA section */
 
 .cta-section {
