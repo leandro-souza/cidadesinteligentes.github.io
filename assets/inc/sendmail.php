@@ -1,77 +1,96 @@
 <?php
+declare(strict_types=1);
 
-require_once('phpmailer/class.phpmailer.php');
-require_once('phpmailer/class.smtp.php');
+header('Content-Type: application/json; charset=utf-8');
 
-$mail = new PHPMailer();
+// Log local (para diagnosticar 500 sem expor erro ao usuário)
+ini_set('log_errors', '1');
+ini_set('error_log', __DIR__ . '/sendmail_error.log');
 
-//$mail->SMTPDebug = 3;                               // Enable verbose debug output
-$mail->isSMTP();                                      // Set mailer to use SMTP
-$mail->Host = 'server.ourhtmldemo.com';  // Specify main and backup SMTP servers
-$mail->SMTPAuth = true;                                             // Enable SMTP authentication
-$mail->Username = 'cform@html.tonatheme.com';                 // SMTP username
-$mail->Password = 'AsDf12**';             // SMTP password
-$mail->SMTPSecure = true;                            // Enable TLS encryption, `ssl` also accepted
-$mail->Port = 465;                                    // TCP port to connect to
+// PHPMailer (caminho robusto)
+require_once(__DIR__ . '/phpmailer/class.phpmailer.php');
+require_once(__DIR__ . '/phpmailer/class.smtp.php');
 
-$message = "";
-$status = "false";
+$message = '';
+$status  = 'false';
 
-if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
-    if( $_POST['form_name'] != '' AND $_POST['form_email'] != '' AND $_POST['form_subject'] != '' ) {
-
-        $name = $_POST['form_name'];
-        $email = $_POST['form_email'];
-        $subject = $_POST['form_subject'];
-        $phone = $_POST['form_phone'];
-        $message = $_POST['form_message'];
-
-        $subject = isset($subject) ? $subject : 'New Message | Contact Form';
-
-        $botcheck = $_POST['form_botcheck'];
-
-        $toemail = 'cidades.intel.ire@ifba.edu.br'; // Your Email Address
-        $toname = 'template_path'; // Your Name
-
-        if( $botcheck == '' ) {
-
-            $mail->SetFrom( $email , $name );
-            $mail->AddReplyTo( $email , $name );
-            $mail->AddAddress( $toemail , $toname );
-            $mail->Subject = $subject;
-
-            $name = isset($name) ? "Name: $name<br><br>" : '';
-            $email = isset($email) ? "Email: $email<br><br>" : '';
-            $phone = isset($phone) ? "Phone: $phone<br><br>" : '';
-            $message = isset($message) ? "Message: $message<br><br>" : '';
-
-            $referrer = $_SERVER['HTTP_REFERER'] ? '<br><br><br>This Form was submitted from: ' . $_SERVER['HTTP_REFERER'] : '';
-
-            $body = "$name $email $phone $message $referrer";
-
-            $mail->MsgHTML( $body );
-            $sendEmail = $mail->Send();
-
-            if( $sendEmail == true ):
-                $message = 'We have <strong>successfully</strong> received your Message and will get Back to you as soon as possible.';
-                $status = "true";
-            else:
-                $message = 'Email <strong>could not</strong> be sent due to some Unexpected Error. Please Try Again later.<br /><br /><strong>Reason:</strong><br />' . $mail->ErrorInfo . '';
-                $status = "false";
-            endif;
-        } else {
-            $message = 'Bot <strong>Detected</strong>.! Clean yourself Botster.!';
-            $status = "false";
-        }
-    } else {
-        $message = 'Please <strong>Fill up</strong> all the Fields and Try Again.';
-        $status = "false";
+try {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        throw new Exception('Método inválido.');
     }
-} else {
-    $message = 'An <strong>unexpected error</strong> occured. Please Try Again later.';
-    $status = "false";
+
+    // Campos do seu formulário
+    $name     = trim($_POST['form_name'] ?? '');
+    $email    = trim($_POST['form_email'] ?? '');
+    $subject  = trim($_POST['form_subject'] ?? '');
+    $bodyMsg  = trim($_POST['form_message'] ?? '');
+    $botcheck = trim($_POST['form_botcheck'] ?? '');
+
+    if ($botcheck !== '') {
+        throw new Exception('Bot detectado.');
+    }
+
+    if ($name === '' || $email === '' || $subject === '' || $bodyMsg === '') {
+        throw new Exception('Preencha nome, e-mail, assunto e mensagem.');
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        throw new Exception('E-mail inválido.');
+    }
+
+    // ===== DESTINO =====
+    $toEmail = 'cidades.intel.ire@ifba.edu.br';  // destino
+    $toName  = 'Projeto Cidades Inteligentes';   // nome do destino
+
+    // ===== SMTP (ajuste com dados reais do IFBA) =====
+    // Se não tiver SMTP, veja o fallback mail() logo abaixo.
+    $smtpHost = 'SEU_SMTP_HOST';
+    $smtpUser = 'SEU_SMTP_USER';
+    $smtpPass = 'SEU_SMTP_PASS';
+    $smtpPort = 587;       // 587 (tls) ou 465 (ssl)
+    $smtpSec  = 'tls';     // 'tls' ou 'ssl'
+    // ================================================
+
+    $mail = new PHPMailer(true);
+
+    // Se você NÃO tiver SMTP e o servidor tiver mail() configurado, comente o bloco SMTP
+    // e use: $mail->isMail();
+    $mail->isSMTP();
+    $mail->Host       = $smtpHost;
+    $mail->SMTPAuth   = true;
+    $mail->Username   = $smtpUser;
+    $mail->Password   = $smtpPass;
+    $mail->SMTPSecure = $smtpSec;   // 'tls' ou 'ssl' (NÃO boolean)
+    $mail->Port       = $smtpPort;
+
+    // Evita problemas de SPF/DMARC: "From" deve ser do domínio do SMTP.
+    $mail->setFrom($smtpUser, 'Formulário do Site');
+    $mail->addReplyTo($email, $name);
+
+    $mail->addAddress($toEmail, $toName);
+    $mail->Subject = "[Contato - Site] " . $subject;
+
+    $referrer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+
+    $htmlBody =
+        "<strong>Nome:</strong> " . htmlspecialchars($name) . "<br><br>" .
+        "<strong>E-mail:</strong> " . htmlspecialchars($email) . "<br><br>" .
+        "<strong>Mensagem:</strong><br>" . nl2br(htmlspecialchars($bodyMsg)) .
+        ($referrer ? "<br><br><small>Enviado a partir de: " . htmlspecialchars($referrer) . "</small>" : "");
+
+    $mail->msgHTML($htmlBody);
+
+    if (!$mail->send()) {
+        throw new Exception("Falha ao enviar: " . $mail->ErrorInfo);
+    }
+
+    $message = 'Mensagem enviada com sucesso! Retornaremos em breve.';
+    $status  = 'true';
+
+} catch (Throwable $e) {
+    error_log("sendmail.php ERROR: " . $e->getMessage());
+    $message = 'Não foi possível enviar sua mensagem no momento. Tente novamente mais tarde.';
+    $status  = 'false';
 }
 
-$status_array = array( 'message' => $message, 'status' => $status);
-echo json_encode($status_array);
-?>
+echo json_encode(['message' => $message, 'status' => $status], JSON_UNESCAPED_UNICODE);

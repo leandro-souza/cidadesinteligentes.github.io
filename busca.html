@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Busca</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link href="assets/css/bootstrap.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+  <link href="assets/css/responsive.css" rel="stylesheet">
+  <link href="assets/css/color.css" rel="stylesheet">
+
+  <style>
+    .search-results { margin-top: 30px; }
+    .search-item { padding: 18px; border: 1px solid rgba(0,0,0,.08); border-radius: 10px; margin-bottom: 14px; }
+    .search-item h4 { margin-bottom: 8px; }
+    .search-item .snippet { margin-bottom: 0; opacity: .9; }
+    .search-meta { font-size: 13px; opacity: .7; margin-bottom: 8px; }
+    mark { padding: 0 2px; }
+  </style>
+</head>
+
+<body>
+
+
+  
+  <div class="page-wrapper">
+    <!-- Banner simples (você pode trocar pelo seu page-title padrão) -->
+    <section class="page-title" style="background-image: url(assets/images/background/bg-solucao_aplicativo.jpg);">
+      <div class="auto-container">
+        <div class="content-box">
+          <div class="content-wrapper">
+            <div class="title">
+              <h1>Busca no site</h1>
+              <h1 style="font-size: 38px;">Resultados para <span class="text-orange" id="qLabel"></span></h1>
+            </div>
+            <ul class="bread-crumb">
+              <li><a href="index.html">Início</a></li>
+              <li>Busca</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sidebar-page-container">
+      <div class="auto-container">
+
+        <!-- Campo de busca na página -->
+        <div class="row">
+          <div class="col-lg-8">
+            <form class="mb-4" action="busca.html" method="get" style="display:flex; gap:10px; align-items:center;">
+              <input class="form-control" type="search" name="q" id="qInput" placeholder="Digite para buscar..." required>
+              <button class="theme-btn btn-style-one" type="submit"><span class="btn-title">Buscar</span></button>
+            </form>
+
+            <div id="status" class="search-meta"></div>
+            <div id="results" class="search-results"></div>
+          </div>
+
+          <!-- Sidebar opcional -->
+          <div class="col-lg-4">
+            <aside class="sidebar blog-sidebar sidebar-style-two">
+              <div class="widget">
+                <h3 class="widget-title">Dicas</h3>
+                <div class="text">
+                  Use termos curtos (ex.: “SEI”, “Tributos”, “Lapão”, “DOCDigital”).<br>
+                  A busca encontra ocorrências em títulos e descrições indexadas.
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer do seu template pode ficar aqui -->
+  </div>
+
+  <script>
+    // 1) Lê o parâmetro ?q=
+    const params = new URLSearchParams(window.location.search);
+    const qRaw = (params.get("q") || "").trim();
+    const q = qRaw.toLowerCase();
+
+    const qLabel = document.getElementById("qLabel");
+    const qInput = document.getElementById("qInput");
+    const status = document.getElementById("status");
+    const resultsEl = document.getElementById("results");
+
+    qLabel.textContent = qRaw ? `"${qRaw}"` : "(vazio)";
+    qInput.value = qRaw;
+
+    // 2) Helpers
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+    }
+
+    function highlight(text, term) {
+      if (!term) return escapeHtml(text);
+      const safe = escapeHtml(text);
+      // destaque simples, case-insensitive
+      const re = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "ig");
+      return safe.replace(re, "<mark>$1</mark>");
+    }
+
+    function scoreItem(item, term) {
+      // Peso maior em título, menor em descrição
+      let s = 0;
+      const title = (item.title || "").toLowerCase();
+      const desc = (item.description || "").toLowerCase();
+      const keywords = (item.keywords || "").toLowerCase();
+
+      if (title.includes(term)) s += 5;
+      if (keywords.includes(term)) s += 3;
+      if (desc.includes(term)) s += 2;
+
+      // bônus por múltiplas palavras
+      const parts = term.split(/\s+/).filter(Boolean);
+      if (parts.length > 1) {
+        for (const p of parts) {
+          if (title.includes(p)) s += 2;
+          if (desc.includes(p)) s += 1;
+          if (keywords.includes(p)) s += 1;
+        }
+      }
+      return s;
+    }
+
+    function render(items) {
+      if (!qRaw) {
+        status.textContent = "Digite um termo de busca acima.";
+        resultsEl.innerHTML = "";
+        return;
+      }
+
+      if (!items.length) {
+        status.textContent = "Nenhum resultado encontrado.";
+        resultsEl.innerHTML = "";
+        return;
+      }
+
+      status.textContent = `${items.length} resultado(s) encontrado(s).`;
+
+      resultsEl.innerHTML = items.map(it => `
+        <div class="search-item">
+          <div class="search-meta">${escapeHtml(it.category || "Página")} • <a href="${escapeHtml(it.url)}">${escapeHtml(it.url)}</a></div>
+          <h4><a href="${escapeHtml(it.url)}">${highlight(it.title || it.url, qRaw)}</a></h4>
+          <p class="snippet">${highlight(it.description || "", qRaw)}</p>
+        </div>
+      `).join("");
+    }
+
+    // 3) Carrega o índice e filtra
+    async function run() {
+      if (!qRaw) return render([]);
+
+      status.textContent = "Carregando índice de busca...";
+      try {
+        const res = await fetch("assets/search-index.json", { cache: "no-store" });
+        if (!res.ok) throw new Error("Não foi possível carregar assets/search-index.json");
+        const data = await res.json();
+
+        const term = q; // já lowercase
+        const hits = data
+          .map(item => ({ item, score: scoreItem(item, term) }))
+          .filter(x => x.score > 0)
+          .sort((a,b) => b.score - a.score)
+          .slice(0, 50)
+          .map(x => x.item);
+
+        render(hits);
+      } catch (e) {
+        status.textContent = "Erro ao carregar a busca. Verifique se o arquivo assets/search-index.json existe.";
+        resultsEl.innerHTML = `<div class="search-item"><p class="snippet">${escapeHtml(String(e))}</p></div>`;
+      }
+    }
+
+    run();
+  </script>
+</body>
+</html>

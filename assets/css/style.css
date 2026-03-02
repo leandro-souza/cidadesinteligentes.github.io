@@ -3878,7 +3878,7 @@ img {
     bottom: 0;
     opacity: 0;
     transition: .5s;
-    background-color: hsla(212, 78%, 53%, 0.8);
+    background-color: hsla(29, 94%, 50%, 0.8);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -6415,6 +6415,98 @@ blockquote cite {
 .blog-single-post .author-box .social-links li a span {
     position: relative;
 }
+
+/* city Form Section */
+
+.city-form-section {
+    position: relative;
+    padding: 120px 0;
+}
+
+.city-form-section .our-facts {
+    position: relative;
+    width: 100%;
+    max-width: 430px;
+    background-color: rgba(17, 17, 17, 0.81);
+    padding: 55px 55px 50px;
+    z-index: 99;
+    padding-top: 50px;
+    background-size: cover;
+}
+
+.city-form-section .our-facts:before {
+    position: absolute;
+    content: '';
+    left: 0;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    background-image: -moz-linear-gradient( 90deg, rgb(0,0,0) 0%, rgba(0,0,0,0) 100%);
+    background-image: -webkit-linear-gradient( 90deg, rgb(0,0,0) 0%, rgba(0,0,0,0) 100%);
+    background-image: -ms-linear-gradient( 90deg, rgb(0,0,0) 0%, rgba(0,0,0,0) 100%);
+}
+  
+.city-form-section .our-facts h4 {
+    position: relative;
+    font-size: 18px;
+    font-weight: 400;
+    color: #fff;
+    margin-bottom: 30px;
+}
+
+.city-form-section .our-facts .inner {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding-bottom: 4px;
+    margin-bottom: 27px;
+    border-bottom: 1px solid #666;
+}
+
+.city-form-section .our-facts .column:last-child .inner {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.city-form-section .our-facts .icon {
+    position: relative;
+    font-size: 34px;
+    color: #fff;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    line-height: 35px;
+}
+
+.city-form-section .our-facts .count-box {
+    position: relative;
+    font-size: 36px;
+    font-weight: 700;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.city-form-section .our-facts .text {
+    position: relative;
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 20px;
+    line-height: 22px;
+}
+
+.city-form-section .wrapper-box {
+    position: relative;
+    box-shadow: 0px 0px 38.25px 6.75px rgba(0, 0, 0, 0.1);
+}
+
+.city-form-section .contact-form-area {
+    position: relative;
+    padding: 70px 85px;
+    padding-left: 20px;
+}
+
 
 /* Contact Form Section */
 
